@@ -81,17 +81,13 @@ const SignUpPage = () => {
       });
     }
     try {
-      // const response = await fetch("/api/otpVerifcation/otpEmail", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json", // Specify the content type as JSON
-      //   },
-      //   body: JSON.stringify({ email }), // Wrap email in an object if it's not an object already
-      // });
-
-      const response = await axios.post('/api/otpVerifcation/otpEmail', {
-        email
-      })
+      const response = await fetch("/api/otpVerifcation/otpEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Specify the content type as JSON
+        },
+        body: JSON.stringify({ email }), // Wrap email in an object if it's not an object already
+      });
 
       if (response.ok) {
       setOtpSentLoading(false)
