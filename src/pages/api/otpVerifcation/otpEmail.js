@@ -31,7 +31,10 @@ const otpVerify = async (req, res) => {
         return res.status(400).json({ error: 'Please provide email!' })
       }
       console.error(error);
-      res.status(500).json({ error: "error occur" })
+      if (error.message === "getaddrinfo ENOTFOUND smtp.gmail.com"){
+        return res.status(500).json({ error: "Internet Connection Had Lost!" })
+      }
+      return res.status(500).json({ error: "error occur" })
     }
     res.send();
   } else if (req.method === "PATCH") {
