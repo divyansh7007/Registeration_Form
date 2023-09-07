@@ -2,12 +2,16 @@
 import React, { useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
+import { CgSpinnerTwoAlt } from 'react-icons/cg';
+
 import "react-toastify/dist/ReactToastify.css";
 
 const SignUpPage = () => {
   const ref = useRef();
   const [name, setName] = useState("");
   const [otp, setOtp] = useState();
+  const [otpSentLoading, setOtpSentLoading] = useState(false);
+  const [otpVerifyLoading, setOtpVerifyLoading] = useState(false);
   const [otpAuth, setOtpAuth] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +51,9 @@ const SignUpPage = () => {
   };
 
   const handleSendOtp = async (email) => {
+    setOtpSentLoading(true);
     if (!email) {
+      setOtpSentLoading(false)
       return toast("Please Provide an Email!", {
         position: "top-right",
         autoClose: 5000,
@@ -69,6 +75,7 @@ const SignUpPage = () => {
       });
 
       if (response.ok) {
+      setOtpSentLoading(false)
         const data = await response.json();
         return toast(data.msg, {
           position: "top-right",
@@ -81,6 +88,7 @@ const SignUpPage = () => {
           theme: "light",
         });
       } else {
+      setOtpSentLoading(false)
         const data = await response.json();
         console.error(`Error: ${response.status}`);
         return toast(data.msg, {
@@ -96,6 +104,7 @@ const SignUpPage = () => {
         // Handle non-200 status codes here
       }
     } catch (error) {
+      setOtpSentLoading(false)
       console.error("An error occurred:", error);
       return toast("An Error Occur, Please Check Your Internet Connection!", {
         position: "top-right",
@@ -112,6 +121,7 @@ const SignUpPage = () => {
   };
 
   const handleVerifyOtp = async (otp) => {
+    setOtpVerifyLoading(true);
     try {
       const response = await fetch("/api/otpVerifcation/otpEmail", {
         method: "PATCH",
@@ -122,6 +132,7 @@ const SignUpPage = () => {
       });
 
       if (response.ok) {
+        setOtpVerifyLoading(false);
         const data = await response.json();
         toast(data.msg, {
           position: "top-right",
@@ -135,6 +146,7 @@ const SignUpPage = () => {
         });
         return setOtpAuth(true); // Access the OtpCode property from the JSON response
       } else {
+        setOtpVerifyLoading(false);
         const data = await response.json();
         toast(data.msg, {
           position: "top-right",
@@ -150,6 +162,7 @@ const SignUpPage = () => {
         // Handle non-200 status codes here
       }
     } catch (error) {
+      setOtpVerifyLoading(false);
       console.error("An error occurred:", error);
       return toast("An Error Occur, Please Check Your Internet Connection!", {
         position: "top-right",
@@ -227,8 +240,8 @@ const SignUpPage = () => {
                 onClick={() => handleSendOtp(email)}
               >
                 <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-indigo-600 top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
-                <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease">
-                  SEND OTP
+                <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease flex items-center justify-center">
+                  { otpSentLoading ? <CgSpinnerTwoAlt className="animate-spin" /> : "SEND OTP" }
                 </span>
               </button>
             </div>
@@ -247,8 +260,8 @@ const SignUpPage = () => {
                 onClick={() => handleVerifyOtp(otp)}
               >
                 <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-indigo-600 top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
-                <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease">
-                  verify OTP
+                <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease flex items-center justify-center">
+                  { otpVerifyLoading ? <CgSpinnerTwoAlt className="animate-spin" /> : "Verify OTP" }
                 </span>
               </button>
             </div>
