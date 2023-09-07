@@ -12,10 +12,7 @@ db();
 
 const register = async (req, res) => {
   if (req.method === "POST") {
-    const { userName, email, password, img } = req.body;
-
-    console.log(req.body);
-    console.log(email, password, userName);
+    const { userName, email, password, img } = JSON.parse(req.body);
 
     if (!userName) {
       return res.status(400).json({ message: "You Have not entered Email Id. Please Reload Your Page And do Verifications!" });
@@ -28,7 +25,7 @@ const register = async (req, res) => {
     try {
       const findUser = await User.findOne({ email });
       if (findUser) {
-        return res.status(401).json({ message: "User Already Exists!" })
+        return res.status(401).json({ message: "User Already Exists!", status: 401 })
       } else {
 
         const salt = await bcrypt.genSalt(10);

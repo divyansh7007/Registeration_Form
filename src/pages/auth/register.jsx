@@ -2,18 +2,18 @@
 import React, { useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-import { CgSpinnerTwoAlt } from 'react-icons/cg';
+import { CgSpinnerTwoAlt } from "react-icons/cg";
 
 import "react-toastify/dist/ReactToastify.css";
 
-import axios from 'axios';
-import { useRouter } from 'next/router';
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const SignUpPage = () => {
   const ref = useRef();
   const router = useRouter();
 
-// Input Handling States
+  // Input Handling States
   const [name, setName] = useState("");
   const [otp, setOtp] = useState();
   const [email, setEmail] = useState("");
@@ -52,15 +52,15 @@ const SignUpPage = () => {
       );
 
       if (response.ok) {
-        setOnImageLoading(false)
+        setOnImageLoading(false);
         const data = await response.json();
         setImageURL(data.secure_url);
       } else {
-        setOnImageLoading(false)
+        setOnImageLoading(false);
         console.error("Image upload failed");
       }
     } catch (error) {
-      setOnImageLoading(false)
+      setOnImageLoading(false);
       console.error("Error uploading image:", error);
     }
   };
@@ -68,7 +68,7 @@ const SignUpPage = () => {
   const handleSendOtp = async (email) => {
     setOtpSentLoading(true);
     if (!email) {
-      setOtpSentLoading(false)
+      setOtpSentLoading(false);
       return toast("Please Provide an Email!", {
         position: "top-right",
         autoClose: 5000,
@@ -90,7 +90,7 @@ const SignUpPage = () => {
       });
 
       if (response.ok) {
-      setOtpSentLoading(false)
+        setOtpSentLoading(false);
         const data = await response.json();
         return toast(data.msg, {
           position: "top-right",
@@ -103,7 +103,7 @@ const SignUpPage = () => {
           theme: "light",
         });
       } else {
-      setOtpSentLoading(false)
+        setOtpSentLoading(false);
         const data = await response.json();
         console.error(`Error: ${response.status}`);
         return toast(data.msg, {
@@ -119,7 +119,7 @@ const SignUpPage = () => {
         // Handle non-200 status codes here
       }
     } catch (error) {
-      setOtpSentLoading(false)
+      setOtpSentLoading(false);
       console.error("An error occurred:", error);
       return toast("An Error Occur, Please Check Your Internet Connection!", {
         position: "top-right",
@@ -197,8 +197,8 @@ const SignUpPage = () => {
     setOnCreateUserLoading(true);
 
     if (!email) {
-      setOnCreateUserLoading(false)
-      return toast('Please Done Email Verification Ones More!', {
+      setOnCreateUserLoading(false);
+      return toast("Please Done Email Verification Ones More!", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -208,10 +208,10 @@ const SignUpPage = () => {
         progress: undefined,
         theme: "light",
       });
-    }else if ( password.length <= 8 ) {
+    } else if (password.length <= 8) {
       setOnCreateUserLoading(false);
       console.log(password.length);
-      return toast('Please Enter Your Password Above 8 Characters!', {
+      return toast("Please Enter Your Password Above 8 Characters!", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -221,10 +221,9 @@ const SignUpPage = () => {
         progress: undefined,
         theme: "light",
       });
-    }
-    else if ( password !== confirmPassword ) {
-      setOnCreateUserLoading(false)
-      return toast('Please Enter Same Password In Both Fields!', {
+    } else if (password !== confirmPassword) {
+      setOnCreateUserLoading(false);
+      return toast("Please Enter Same Password In Both Fields!", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -234,9 +233,9 @@ const SignUpPage = () => {
         progress: undefined,
         theme: "light",
       });
-    }else if ( !password || !confirmPassword || !name ) {
-      setOnCreateUserLoading(false)
-      return toast('Please Fill All The Fields!', {
+    } else if (!password || !confirmPassword || !name) {
+      setOnCreateUserLoading(false);
+      return toast("Please Fill All The Fields!", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -246,28 +245,47 @@ const SignUpPage = () => {
         progress: undefined,
         theme: "light",
       });
-    }else {
-      console.log('Response has started to be send!');
-      const response = await axios.post('/api/auth/register', {
-        userName: name,
-        email,
-        password,
-        img: imageURL
-      });
+    } else {
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            userName: name,
+            email,
+            password,
+            img: imageURL,
+          }),
+        })
 
-      if (response.status === 401) {
-        toast('This Email is already Exists Please Login To Your Account!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }else if (response.status === 500) {
-        toast('Internal Server Error Occur, Please Try After Some Time!', {
+        if (response.status === 401) {
+          return toast("Email Id is already exists!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }else if (response.status === 201) {
+          const data = await response.json();
+          sessionStorage.setItem('token', data.token);
+          toast("User Was Created!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          return router.push('/');
+        }
+      } catch (error) {
+        console.error(error);
+        toast(error.message, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -278,13 +296,8 @@ const SignUpPage = () => {
           theme: "light",
         });
       }
-
-      sessionStorage.setItem('token', response.data.token);
-      setOnCreateUserLoading(false)
-      return router.push('/');
     }
-
-  }
+  };
 
   return (
     <div className=" min-h-screen flex flex-col">
@@ -310,18 +323,20 @@ const SignUpPage = () => {
               otpAuth ? "block" : "hidden"
             } `}
           >
-            {
-              onImageLoading ? <CgSpinnerTwoAlt className="animate-spin cursor-wait text-5xl text-blue-400" /> : <img
-              onClick={() => ref.current.click()}
-              className="w-16 rounded-full cursor-pointer"
-              src={
-                imageURL.length === 0
-                  ? "https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black.png"
-                  : imageURL
-              }
-              alt=""
-            />
-            }
+            {onImageLoading ? (
+              <CgSpinnerTwoAlt className="animate-spin cursor-wait text-5xl text-blue-400" />
+            ) : (
+              <img
+                onClick={() => ref.current.click()}
+                className="w-16 rounded-full cursor-pointer"
+                src={
+                  imageURL.length === 0
+                    ? "https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black.png"
+                    : imageURL
+                }
+                alt=""
+              />
+            )}
             <input
               ref={ref}
               type="file"
@@ -347,7 +362,11 @@ const SignUpPage = () => {
               >
                 <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-indigo-600 top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
                 <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease flex items-center justify-center">
-                  { otpSentLoading ? <CgSpinnerTwoAlt className="animate-spin" /> : "SEND OTP" }
+                  {otpSentLoading ? (
+                    <CgSpinnerTwoAlt className="animate-spin" />
+                  ) : (
+                    "SEND OTP"
+                  )}
                 </span>
               </button>
             </div>
@@ -366,7 +385,11 @@ const SignUpPage = () => {
               >
                 <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-indigo-600 top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
                 <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease flex items-center justify-center">
-                  { otpVerifyLoading ? <CgSpinnerTwoAlt className="animate-spin" /> : "Verify OTP" }
+                  {otpVerifyLoading ? (
+                    <CgSpinnerTwoAlt className="animate-spin" />
+                  ) : (
+                    "Verify OTP"
+                  )}
                 </span>
               </button>
             </div>
@@ -396,10 +419,17 @@ const SignUpPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <button onClick={onSubmit} className="rounded-md w-full px-3.5 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600">
+            <button
+              onClick={onSubmit}
+              className="rounded-md w-full px-3.5 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600"
+            >
               <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-indigo-600 top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
               <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease flex items-center justify-center">
-                { onCreateUserLoading ? <CgSpinnerTwoAlt className="animate-spin" /> : "Create Your Account" }
+                {onCreateUserLoading ? (
+                  <CgSpinnerTwoAlt className="animate-spin" />
+                ) : (
+                  "Create Your Account"
+                )}
               </span>
             </button>
           </div>
