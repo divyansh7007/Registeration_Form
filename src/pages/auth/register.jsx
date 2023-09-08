@@ -258,7 +258,7 @@ const SignUpPage = () => {
         })
 
         if (response.status === 401) {
-          return toast("Email Id is already exists!", {
+          toast("Email Id is already exists!", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -268,7 +268,9 @@ const SignUpPage = () => {
             progress: undefined,
             theme: "light",
           });
+          return setOnCreateUserLoading(false);
         }else if (response.status === 201) {
+          setOnCreateUserLoading(false)
           const data = await response.json();
           sessionStorage.setItem('token', data.token);
           toast("User Was Created!", {
