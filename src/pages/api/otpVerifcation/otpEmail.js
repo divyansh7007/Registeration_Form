@@ -17,6 +17,8 @@ const otpVerify = async (req, res) => {
     const OtpCode = randomInt(111111, 999999);
     otp = OtpCode;
     const { email } = req.body
+
+    console.log(email);
     try {
       const info = await Transporter.sendMail({
         from: process.env.USER_EMAIL,

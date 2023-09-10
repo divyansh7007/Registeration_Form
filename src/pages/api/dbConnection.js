@@ -4,7 +4,7 @@ const dbUrl = process.env.NEXT_PUBLIC_DB_URI;
 
 const dbConnectionHandler = async () => {
     if (mongoose.connection.readyState === 0) {
-        mongoose.connect(dbUrl)
+        return mongoose.connect(dbUrl)
             .then(() => {
                 console.log('MongoDB connected successfully');
             })
@@ -12,7 +12,7 @@ const dbConnectionHandler = async () => {
                 console.error('MongoDB connection error:', err);
             });
     } else {
-        console.log('MongoDB connection already established');
+        return console.log('MongoDB connection already established');
     }
 }
 
